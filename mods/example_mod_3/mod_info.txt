@@ -1,0 +1,6 @@
+name:Example mod #3
+version:1.0
+creator:voliol
+df_version:0.47.05
+description_string:An example mod. Gives all leafy trees wood made of diamonds, and doubles the size of the gold colossus from Example mod #1.
+dependencies_string:Vanilla Dwarf Fortress, Example mod #1

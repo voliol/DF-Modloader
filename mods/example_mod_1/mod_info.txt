@@ -1,0 +1,6 @@
+name:Example mod #1
+version:1.0
+creator:voliol
+df_version:0.47.05
+description_string:An example mod. Adds a gold colossus, removes the bronze colossus, and gives all poisonous creatures and mammals [CARNIVORE] and [PRONE_TO_RAGE].
+dependencies_string:Vanilla Dwarf Fortress
