@@ -4,7 +4,9 @@ from operator import attrgetter
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 from PIL import ImageTk, Image
+from tooltip import create_tooltip
 # raw_handler-related imports
 from raw_handler import Mod
 from raw_handler import Compiler
@@ -225,10 +227,17 @@ def reload_mods_folder_button_command():
     load_mods_folder()
 
 
+def change_output_folder_button_command():
+    global output_path
+    output_path = filedialog.askdirectory()
+    # updates the tooltip
+    create_tooltip(change_output_folder_button, text=output_path)
+
+
 def compile_button_command():
     print("Compiling started...")
     compiler = Compiler()
-    compiler.compile_mods(selected_mods, os.getcwd() + "/output")
+    compiler.compile_mods(selected_mods, output_path)
     print("Compiling completed! Look in your output folder!")
 
 
@@ -295,6 +304,12 @@ reload_mods_folder_button = tk.Button(mod_list_frame, text="Reload mods folder",
                                       command=reload_mods_folder_button_command)
 reload_mods_folder_button.grid(column=2, row=6)
 
+# button for changing output folder
+change_output_folder_button = tk.Button(mod_list_frame, text="Change output folder (hover for current)",
+                                        command=change_output_folder_button_command)
+change_output_folder_button.grid(column=5, row=6)
+create_tooltip(change_output_folder_button, text=os.getcwd() + "\\output")
+
 # --- Mod info ---------------------------------------------------------------------------------------------------------
 
 mod_info_frame = ttk.Frame(mainframe, relief='sunken', borderwidth=5, width=100)
@@ -323,7 +338,6 @@ compile_button.grid(column=1, row=1)
 modloader_help_button = tk.Button(mainframe, text="?", command=modloader_help_button_command)
 modloader_help_button.grid(column=2, row=1, sticky=tk.E)
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 # initializes the lists of all mods, selected mods, and non-selected mods
@@ -342,6 +356,9 @@ image = ImageTk.PhotoImage(Image.open('logo.png'))
 logo_label = ttk.Label(mainframe)
 logo_label['image'] = image
 logo_label.grid(column=2, row=1, sticky=tk.S)
+
+# sets the default output path
+output_path = os.getcwd() + "\\output"
 
 # runs the main loop
 root.mainloop()

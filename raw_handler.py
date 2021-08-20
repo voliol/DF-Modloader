@@ -326,6 +326,11 @@ class Compiler:
                         for co in current_objects:
                             self.top_level_objects[current_object_type].append(co)
                             self.top_level_objects_dicts[current_object_type][co.object_id] = co
+                    # or fulfills a removal
+                    elif reading_mode == "REMOVE":
+                        for co in current_objects:
+                            self.top_level_objects[current_object_type].remove(co)
+                            del self.top_level_objects_dicts[current_object_type][co.object_id]
 
                     if token[0] in pos_object_types:
                         # always the same, regardless of kind of raw entry ("NEW", "EDIT" or whatever)
@@ -337,11 +342,54 @@ class Compiler:
                                                          source_mod_name_and_version=mod.name + " " + mod.version)]
                             reading_mode = "NEW"
 
+                        elif token[1] in ["SUBSELECT", "UNSELECT"]:
+                            # does a further selection within the current_objects, instead of all objects
+                            select_objects = []
+                            # selects all objects of that object type (which have hitherto been defined)
+                            if token[2] == "ALL":
+                                select_objects = [raw_object for raw_object in current_objects]
+                            # selects a single object
+                            elif token[2] == "BY_ID":
+                                # there should at most be one object with a specific object id,
+                                # the iteration is just to find it if it exists
+                                select_objects += [raw_object for raw_object in current_objects
+                                                   if raw_object.object_id == token[3]]
+                            # selects multiple objects
+                            # ...by object class
+                            elif token[2] == "BY_CLASS":
+                                select_objects += [raw_object for raw_object in current_objects
+                                                   if (["OBJECT_CLASS", token[3]] in raw_object.tokens or
+                                                       ["CREATURE_CLASS", token[3]] in raw_object.tokens)]
+                            # ...by token
+                            elif token[2] == "BY_TOKEN":
+                                select_objects += [raw_object for raw_object in current_objects
+                                                   if raw_object.has_token(token[3])]
+                            # ...by precise token (i.e. token with all the values the same as well)
+                            elif token[2] == "BY_TOKEN_PRECISE":
+                                select_objects += [raw_object for raw_object in current_objects
+                                                   if token[3:] in raw_object.tokens]
+
+                            # SUBSELECT keeps only the recently selected objects.
+                            # If PLUS_SELECT is a logical 'or', this is the logical 'and'.
+                            if token[1] == "SUBSELECT":
+                                current_objects = [raw_object for raw_object in select_objects]
+                            # UNSELECT removes all recently selected objects from current_objects
+                            elif token[1] == "UNSELECT":
+                                current_objects = [raw_object for raw_object in current_objects
+                                                   if raw_object not in select_objects]
+
+                            print(token, reading_mode, [o.object_id for o in current_objects])
+
+                            # if it wasn't able to find any applicable objects
+                            if len(current_objects) == 0:
+                                reading_mode = "NONE"
+
                         else:
                             # selects out the "current objects" before knowing what to do with them
                             # if you're not plus-selecting, resets the current objects before
                             if token[1] != "PLUS_SELECT":
                                 current_objects = []
+
                             # selects all objects of that object type (which have hitherto been defined)
                             if token[2] == "ALL":
                                 current_objects = [raw_object for raw_object in
@@ -376,13 +424,10 @@ class Compiler:
                                 reading_mode = "EDIT"
 
                             elif token[1] == "REMOVE":
-                                # removes the objects immediately
-                                for co in current_objects:
-                                    self.top_level_objects[current_object_type].remove(co)
-                                    del self.top_level_objects_dicts[current_object_type][co.object_id]
-                                reading_mode = "NONE"
+                                reading_mode = "REMOVE"
 
-                        # resets the object variation related stuff
+                        # resets the object variation related stuff,
+                        # note that it's reset by PLUS_SELECT, SUBSELECT and UNSELECT.
                         ov_insertion_indexes = [len(co.tokens) for co in current_objects]
                         pending_ov_token_lists = [[]] * len(current_objects)
 
