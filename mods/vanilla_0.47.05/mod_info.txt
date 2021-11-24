@@ -1,0 +1,6 @@
+name:Vanilla Dwarf Fortress
+version:0.47.05
+creator:Bay 12 Games
+df_version:0.47.05
+description_string:Vanilla raws from Dwarf Fortress 0.47.05
+dependencies_string:No dependencies.
