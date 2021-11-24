@@ -1,6 +1,0 @@
-name:Example mod #2
-version:1.0
-creator:voliol
-df_version:0.47.05
-description_string:An example mod. Gives all entities with currency dragon as pets, in exchange for losing their currency. Also inverts kobold animal definitions so they like mammals and dislike poisonous animals.
-dependencies_string:Vanilla Dwarf Fortress

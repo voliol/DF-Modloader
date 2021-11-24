@@ -1,6 +1,0 @@
-name:Example mod #4
-version:1.0
-creator:voliol
-df_version:0.47.05
-description_string:An example mod. Uses SUBSELECT and UNSELECT to select all domestic mammals except the cow, and make their females lay eggs.
-dependencies_string:Vanilla Dwarf Fortress
