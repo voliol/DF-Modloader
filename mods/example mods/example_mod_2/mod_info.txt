@@ -1,0 +1,6 @@
+name:Example mod #2
+version:1.0
+creator:voliol
+df_version:0.47.05
+description_string:An example mod. Overwrites the apple tree object (causing no duplication).
+dependencies_string:Vanilla Dwarf Fortress

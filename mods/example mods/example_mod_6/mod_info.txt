@@ -1,0 +1,6 @@
+name:Example mod #6
+version:1.0
+creator:voliol
+df_version:0.47.05
+description_string:An example mod. Adds a BUG_PARCHMENT material template, and allows all chitin-havers to use it by editing MATERIAL_TEMPLATE:CHITIN_TEMPLATE and OBJECT_TEMPLATE:CHITIN_MATERIALS. Does not currently work, because object templates can't be edited.
+dependencies_string:Vanilla Dwarf Fortress

@@ -1,0 +1,16 @@
+plant_example
+
+[OBJECT:PLANT]
+
+a stripped down definition to overwrite the vanilla one, just as an example
+
+[PLANT:APPLE] malus sieversii
+	[NAME:apple tree][NAME_PLURAL:apple trees][ADJ:apple tree]
+	[USE_MATERIAL_TEMPLATE:STRUCTURAL:STRUCTURAL_PLANT_TEMPLATE]
+	[BASIC_MAT:LOCAL_PLANT_MAT:STRUCTURAL]
+	[USE_MATERIAL_TEMPLATE:WOOD:WOOD_TEMPLATE]
+	[TREE:LOCAL_PLANT_MAT:WOOD][TREE_TILE:5]
+	[PREFSTRING:fruit]
+	[DRY]
+	[BIOME:ANY_TEMPERATE]
+	[SAPLING]

@@ -1,0 +1,6 @@
+name:Example mod #5
+version:1.0
+creator:voliol
+df_version:0.47.05
+description_string:An example mod. Gives slug men legs, and removes those of snail men, by changing what object template they use (ANIMAL_PERSON/ANIMAL_PERSON_LEGLESS) with CONVERT_SPEC_TOKEN.
+dependencies_string:Vanilla Dwarf Fortress
