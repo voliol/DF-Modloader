@@ -1,0 +1,40 @@
+NEW_TAG and NEW_CTAG removed, in favor for the already synonymous ADD_TAG and ADD_CTAG
+This is arbitrary; the reason for me preferring ADD is that it "rhymes" better with REMOVE
+
+creature variations removed
+body detail plans not removed, but all except BP_POSITION and BP_RELATION are relegated to (creature) object variations
+ADD_MATERIAL => USE_MATERIAL_TEMPLATE
+ADD_TISSUE => USE_TISSUE_TEMPLATE
+BP_LAYERS => kept, but transformed into repeated TISSUE_LAYER in a late step, as creatures sadly don't have BP_LAYERS
+             This also means creatures can have it outside of templates
+BP_RELSIZE => RELSIZE
+
+the OT tokens that replace creature variations are applied instantly, instead of waiting for an
+APPLY_(CURRENT_)CREATURE_VARIATION
+
+the syntax for token conversion is different, instead of
+[OT_CONVERT_TAG]
+	[OTCT_MASTER:x]
+	[OTCT_TARGET:y]
+	[OTCT_REPLACEMENT:z]
+[OT_CONVERT_TAG]
+	[OTCT_MASTER:x]
+	[OTCT_TARGET:u]
+	[OTCT_REPLACEMENT:v]
+it's 
+[OT_CONVERT_TAG:x]
+	[OTCT_TARGET:y]
+		[OTCT_REPLACEMENT:z]
+	[OTCT_TARGET:u]
+		[OTCT_REPLACEMENT:v]
+
+the replacement for APPLY_CREATURE_VARIATION and BODY_DETAIL_PLAN is USE_OBJECT_TEMPLATE
+
+These syntaxes currently exist:
+APPLY_CREATURE_VARIATION:template name:args
+BODY_DETAIL_PLAN:template name:args
+USE_TISSUE_TEMPLATE:new id:template name
+USE_MATERIAL_TEMPLATE:new id:template name (creatures and plants)
+USE_MATERIAL_TEMPLATE:template name        (inorganics)
+
+

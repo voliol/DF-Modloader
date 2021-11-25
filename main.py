@@ -10,6 +10,7 @@ from tooltip import create_tooltip
 # raw_handler-related imports
 from raw_handler import Mod
 from raw_handler import Compiler
+from raw_handler import SyntaxUpdater
 
 
 def select_from_non_selected_mods(*args):
@@ -82,37 +83,56 @@ def update_non_selected_mods_listbox():
 def load_mods_folder():
     global mods, non_selected_mods, missing_mods
 
+    def load_mod(path):
+        mod_info_file = open(path + "\\mod_info.txt", "r", encoding="latin1")
+        # populates a Mod object with what's in the mod_info_file, and appends it to the mods list
+        mod_name = mod_info_file.readline().replace("name:", "").replace("\n", "")
+        mod_version = mod_info_file.readline().replace("version:", "").replace("\n", "")
+        # already loaded mods are made to keep their object IDs (so other parts of the code can work)
+        is_old_mod = False
+        for old_mod in mods:
+            if (mod_name, mod_version) == (old_mod.name, old_mod.version):
+                is_old_mod = True
+                # the mod is re-initialized, but its identity remains the same
+                old_mod.__init__(name=mod_name, version=mod_version,
+                                 creator=mod_info_file.readline().replace("creator:", "").replace("\n", ""),
+                                 df_version=mod_info_file.readline().replace("df_version:", "").replace("\n", ""),
+                                 description_string=mod_info_file.readline().replace("description_string:", ""),
+                                 dependencies_string=mod_info_file.readline().replace("dependencies_string:", ""),
+                                 path=path)
+                new_mods.append(old_mod)
+        if not is_old_mod:
+            mod_creator = mod_info_file.readline().replace("creator:", "").replace("\n", "")
+            mod_df_version = mod_info_file.readline().replace("df_version:", "").replace("\n", "")
+            mod_description_string = mod_info_file.readline().replace("description_string:", "")
+            mod_dependencies_string = mod_info_file.readline().replace("dependencies_string:", "")
+            new_mods.append(Mod(name=mod_name, version=mod_version, creator=mod_creator, df_version=mod_df_version,
+                                description_string=mod_description_string, dependencies_string=mod_dependencies_string,
+                                path=path))
+        mod_info_file.close()
+
     new_mods = []
     # finds the mods
-    for mod_directory in os.scandir(os.getcwd() + "\\mods"):
-        try:
-            open(mod_directory.path + "\\mod_info.txt", "r", encoding="latin1")
-        except FileNotFoundError:
-            print(mod_directory.path + " is not a valid mod - it lacks mod_info.txt")
-        else:
-            mod_info_file = open(mod_directory.path + "\\mod_info.txt", "r", encoding="latin1")
-            # populates a Mod object with what's in the mod_info_file, and appends it to the mods list
-            mod_name = mod_info_file.readline().replace("name:", "").replace("\n", "")
-            mod_version = mod_info_file.readline().replace("version:", "").replace("\n", "")
-            # already loaded mods are made to keep their object IDs (so other parts of the code can work)
-            is_old_mod = False
-            for old_mod in mods:
-                if (mod_name, mod_version) == (old_mod.name, old_mod.version):
-                    is_old_mod = True
-                    old_mod.creator = mod_info_file.readline().replace("creator:", "").replace("\n", "")
-                    old_mod.df_version = mod_info_file.readline().replace("df_version:", "").replace("\n", "")
-                    old_mod.description_string = mod_info_file.readline().replace("description_string:", "")
-                    old_mod.dependencies_string = mod_info_file.readline().replace("dependencies_string:", "")
-                    old_mod.path = mod_directory.path
-                    new_mods.append(old_mod)
-            if not is_old_mod:
-                mod_creator = mod_info_file.readline().replace("creator:", "").replace("\n", "")
-                mod_df_version = mod_info_file.readline().replace("df_version:", "").replace("\n", "")
-                mod_description_string = mod_info_file.readline().replace("description_string:", "")
-                mod_dependencies_string = mod_info_file.readline().replace("dependencies_string:", "")
-                new_mods.append(Mod(name=mod_name, version=mod_version, creator=mod_creator, df_version=mod_df_version,
-                                description_string=mod_description_string, dependencies_string=mod_dependencies_string,
-                                path=mod_directory.path))
+    for top_directory in os.scandir(os.getcwd() + "\\mods"):
+        if top_directory.is_dir():
+
+            # Mods may either be directly in the mods folder (i.e. contained within a folder for each such mod,
+            # but nothing more). A mod needs a mod_info.txt to be valid.
+            if os.path.isfile(top_directory.path + "\\mod_info.txt"):
+                load_mod(top_directory.path)
+
+            # Or mods may be part of a "modpack", containing a modpack_info.txt and multiple such mod folders
+            elif os.path.isfile(top_directory.path + "\\modpack_info.txt"):
+                for mod_directory in os.scandir(top_directory.path):
+                    if mod_directory.is_dir():
+                        if os.path.isfile(mod_directory.path + "\\mod_info.txt"):
+                            load_mod(mod_directory.path)
+                        else:
+                            print(mod_directory.path + " is not neither a valid mod nor a valid modpack - "
+                                                       "it lacks mod_info.txt")
+            else:
+                print(top_directory.path + " is not neither a valid mod nor a valid modpack - it lacks mod_info.txt "
+                                           "/ modpack_info.txt")
 
     # old mods that were not loaded now must be missing
     missing_mods = []
@@ -137,10 +157,9 @@ def load_mods_folder():
 def modloader_help_button_command():
     messagebox.showinfo(message='DF Modloader mockup\nVoliol 2021\n'
                                 'This is a mockup I made for a mod loader for Dwarf Fortress. ' 
-                                'It reads mods from a folder, and compiles them. There are also some additional '
-                                'functionality/tokens, see the reddit/forum post where you probably found this. '
-                                '\nDue to a lack of time, I will not be maintaining or continuing this project'
-                                'any time soon. '
+                                'It reads mods from a folder, and compiles them. '
+                                'This version was developed after discussions with Mr_Crabman, to approach a '
+                                'suggestion for the mod structure rewrite, which is closing in at the time of writing. '
                                 'The source code is available for anyone to use or edit, if they feel like picking '
                                 'it up.'
                                 '\nCompiled mods are put in the output folder.',
@@ -232,6 +251,15 @@ def change_output_folder_button_command():
     output_path = filedialog.askdirectory()
     # updates the tooltip
     create_tooltip(change_output_folder_button, text=output_path)
+
+
+def update_syntax_button_command():
+    print("Updating syntax started...")
+    syntax_updater = SyntaxUpdater()
+    syntax_updater.update_mods_syntax(selected_mods, backup_path)
+    # so the updated raws are used
+    load_mods_folder()
+    print("Updating syntax completed! Look in your mods folder! Find the unchanged files in the backup folder.")
 
 
 def compile_button_command():
@@ -331,9 +359,16 @@ mod_info_text_scrollbar.grid(column=1, row=1)
 
 # --- Bottom row buttons (Compile and ?/Help)---------------------------------------------------------------------------
 
-compile_button = tk.Button(mainframe, text="Compile/install mods", command=compile_button_command,
-                           background='Green', foreground='White')
+compile_setting_checkbutton = tk.Checkbutton(mainframe, text="Multi-step compilation?")
+compile_setting_checkbutton.grid(column=0, row=1, sticky=tk.E)
+
+compile_button = tk.Button(mainframe, text="\u2460Update mods' syntax", command=update_syntax_button_command,
+                           background='Gray', foreground='White')
 compile_button.grid(column=1, row=1)
+
+compile_button = tk.Button(mainframe, text="\u2461Compile/install mods", command=compile_button_command,
+                           background='Green', foreground='White')
+compile_button.grid(column=1, row=2)
 
 modloader_help_button = tk.Button(mainframe, text="?", command=modloader_help_button_command)
 modloader_help_button.grid(column=2, row=1, sticky=tk.E)
@@ -359,6 +394,8 @@ logo_label.grid(column=2, row=1, sticky=tk.S)
 
 # sets the default output path
 output_path = os.getcwd() + "\\output"
+# sets the default backup path
+backup_path = os.getcwd() + "\\backup"
 
 # runs the main loop
 root.mainloop()
