@@ -1,10 +1,16 @@
 # DF-Modloader
 A loader/compiler/manager for Dwarf Fortress mods
 
-This project is just a (working) mockup. It is also currently inactive. If you want to work on it, make your own fork.
+This project is just a (working) mockup, to demonstrate/figure out what is needed from one. If you want to work on it, make your own fork.
 Asking me about it is fine though.
 
-Below is my initial forum/reddit post (http://www.bay12forums.com/smf/index.php?topic=178868.0), which will have to do in lack of another explanation:
+
+
+
+
+
+
+Here is the original forum post: (http://www.bay12forums.com/smf/index.php?topic=178868.0), which will have to do in lack of another explanation:
 ---
 I don't recall if it was in a recent interview, FotF reply, or maybe a DF talk, but somewhere Toady was asked about Steam workshop, and what it meant for mod managing. He said he'd take a look at it, and that he was surprised that some kind of utility for managing mods hadn't popped up from the community. Turns out there have been a few attempts at it, but none established themselves firmly as DFhack or Therapist did, and are by now outdated. I've also acquainted myself more closely with how the raws work lately as I developed DF Diagnosipack, So I figured, why don't I give it a try.
 Below is my attempt, which I should already disclaim I will not continue working on. My hope is that it is still workable enough to inspire something better, or to build of off to make a long-standing utility. A third wishful outcome to is that the discussion this spawns, regarding how a mod loader should best be laid out, is helpful to the brothers Adams as they are to implement one into Dwarf Fortress proper.
